@@ -25,9 +25,8 @@ public class LoginDAO {
 				String fullname = rs.getString("fullname");
 				String user = rs.getString("username");
 				String pass = rs.getString("password");
-				int isuser = rs.getInt("isuser");
 				int isadmin = rs.getInt("isadmin");
-				return new Account(id, fullname, username, password, isuser, isadmin);
+				return new Account(id, fullname, username, password, isadmin);
 			}
 		}catch (Exception e) {
 			// TODO: handle exception
@@ -48,9 +47,8 @@ public class LoginDAO {
 				String fullname = rs.getString("fullname");
 				String user = rs.getString("username");
 				String pass = rs.getString("password");
-				int isuser = rs.getInt("isuser");
 				int isadmin = rs.getInt("isadmin");
-				return new Account(id, fullname, user, pass, isuser, isadmin);
+				return new Account(id, fullname, user, pass, isadmin);
 			}
 		}catch (Exception e) {
 			// TODO: handle exception

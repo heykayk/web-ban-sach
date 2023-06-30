@@ -16,13 +16,15 @@ public class Account {
 		this.username = username;
 	}
 	
-	public Account(int id, String fullname, String username, String password, int isuser, int isadmin) {
+	public Account(int id, String fullname, String username, String password, int isadmin) {
 		this.id = id;
 		this.fullname = fullname;
 		this.username = username;
 		this.password = password;
-		this.isuser = isuser;
-		this.isadmin = isadmin;
+		if(isadmin == 1) {
+			this.isadmin = isadmin;
+			this.isadmin = 0;
+		}
 	}
 	
 	public Account(String fullname, String username, String password) {
@@ -68,16 +70,8 @@ public class Account {
 		return isuser;
 	}
 
-	public void setIsuser(int isuser) {
-		this.isuser = isuser;
-	}
-
 	public int getIsadmin() {
 		return isadmin;
-	}
-
-	public void setIsadmin(int isadmin) {
-		this.isadmin = isadmin;
 	}
 
 	@Override
