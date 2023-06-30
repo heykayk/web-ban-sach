@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/cart.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .content {
+            display: flex;
+            width: 100%;
+        }
+
+        .orders {
+            flex: 2;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details {
+            display: none;
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-left: 20px;
+        }
+
+        .orders h2,
+        .order-details h2 {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .order-table th {
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+        }
+
+        .order-table td button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary"
+        style="z-index: 1; position:fixed; top: 0;right: 0;left: 0; margin: 0 5%;background-color: rgb(109, 36, 87); padding: 0px; ">
+        <div class="container-fluid" style="background-color: rgb(109, 36, 87); padding: 8px;">
+            <a class="navbar-brand" style="color: #fff" href="/books">BOOKS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup" th:if="${session.account}">
+                <div class="navbar-nav" th:if="${session.account.isuser}">
+                    <a class="nav-link " style="color: #fff" aria-current="page" href="/don-hang">Đơn Hàng</a>
+                    <a class="nav-link" style="color: #fff" aria-current="page" href="/cart">Giỏ Hàng</a>
+                </div>
+                <div class="navbar-nav" th:if="${session.account.isadmin}">
+                    <a class="nav-link " style="color: #fff" aria-current="page" href="#">Đơn Hàng</a>
+                </div>
+
+            </div>
+            <div th:if="${session.account == null}" class="navbar-nav ml-auto">
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-ki">Đăng kí</a>
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-nhap">Đăng nhập</a>
+            </div>
+            <div th:if="${session.account != null}" class="navbar-nav ml-auto">
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/logout">Đăng xuất</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content">
+            <div class="orders">
+                <h2>Đơn hàng</h2>
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Tên khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-order">
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="order-details" id="orderDetails">
+                <h2>Chi tiết đơn hàng</h2>
+                <div id="orderDetailsContent"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+
+        async function getAllOrder() {
+            await fetch(`/listOrder`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    showOder(data);
+                });
+        }
+
+        getAllOrder();
+
+        function showOder(data) {
+            let tab = ``;
+            for (let order of data) {
+                tab += `<tr>
+                            <td>${order.orderDate}</td>
+                            <td>${order.fullname}</td>
+                            <td>${order.total}</td>
+                            <td>${order.confirm == 0 ? 'chưa xác nhận' : 'đã xác nhận'}</td>
+                            <td><button onclick="showOrderDetails(${order.id})">Chi tiết</button></td>
+                        </tr>`
+            }
+            document.getElementById("tbody-order").innerHTML = tab;
+        }
+
+        async function delOrder(id){
+            console.log(id)
+            if(confirm("Bạn chắc chắn muốn hủy đơn hàng này?")){
+                await fetch(`/delOrder/${id}`)
+                window.location.href = "http://localhost:8080/don-hang";
+            }
+        }
+
+        async function showOrderDetails(id) {
+            var order;
+            await fetch(`http://localhost:8080/don-hang/order/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    order = data;
+                });
+            var list;
+            await fetch(`http://localhost:8080/don-hang/orderItem/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    list = data;
+                });
+            var html = `
+                <div>
+            <div><strong>Mã đơn hàng:</strong> ${order.id}</div>
+            <div><strong>Tên khách hàng:</strong> ${order.fullname}</div>
+            <div><strong>Ngày đặt hàng:</strong> ${order.orderDate}</div>
+            </div>
+            <div>
+                <h3>Sản phẩm đơn hàng</h3>
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                            <th>Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody>`
+            for (let item of list) {
+                html += `<tr>
+                    <td>${item.quantity}</td>
+                    <td>${item.title}</td>
+                    <td>${item.price}</td>
+                    <td>${item.total}</td>
+                </tr>`
+            }
+            html += `</tbody>
+                </table>`
+            if (order.confirm == 0) {
+                html += `<button class = "btn btn-danger col-lg-12" onclick = "delOrder(${order.id})">Hủy Đơn</button>`
+            }
+            html += `</div>`;
+
+            // Gán nội dung HTML cho phần chi tiết đơn hàng
+            orderDetailsContent.innerHTML = html;
+            document.getElementById("orderDetails").style.display = "block";
+        }
+
+    </script>
+</body>
+
+</html>

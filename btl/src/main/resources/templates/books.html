@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/books.css" />
+    <link rel="stylesheet" href="/css/themify-icons/themify-icons.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="main">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary"
+            style="z-index: 1; position:fixed; top: 0;right: 0;left: 0; margin: 0 5%;background-color: rgb(109, 36, 87); padding: 0px; ">
+            <div class="container-fluid" style="background-color: rgb(109, 36, 87); padding: 8px;">
+                <a class="navbar-brand" style="color: #fff" href="/books">BOOKS</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup" th:if="${session.account}">
+                    <div class="navbar-nav" th:if="${session.account.isuser}">
+                        <a class="nav-link " style="color: #fff" aria-current="page" href="/don-hang">Đơn Hàng</a>
+                        <a class="nav-link" style="color: #fff" aria-current="page" href="/cart">Giỏ Hàng</a>
+                    </div>
+                    <div class="navbar-nav" th:if="${session.account.isadmin}">
+                    	<a class="nav-link " style="color: #fff" aria-current="page" href="/xac-nhan-don-hang">Đơn Hàng</a>
+                    </div>
+
+                </div>
+                <div th:if="${session.account == null}" class="navbar-nav ml-auto">
+                    <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-ki">Đăng kí</a>
+                    <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-nhap">Đăng nhập</a>
+                </div>
+                <div th:if="${session.account != null}" class="navbar-nav ml-auto">
+                    <a class="nav-link" style="color: #fff" aria-current="page" href="/logout">Đăng xuất</a>
+                </div>
+
+            </div>
+        </nav>
+        <div class="container">
+
+            <table class="table table-striped talbe-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Tác giả</th>
+                        <th>Ngày phát hành</th>
+                        <th>Thể loại</th>
+                        <th>Số trang</th>
+                        <th>Số lượng đã bán</th>
+                        <div th:if="${session.account != null}">
+                            <th>Action</th>
+                        </div>
+
+                    </tr>
+                </thead>
+                <tbody class="list-product" id="book-rows" style="font-size: 16px; color: #000">
+                    <tr th:each="book: ${books}">
+                        <td th:text="${book.title}"></td>
+                        <td th:text="${book.author}"></td>
+                        <td th:text="${book.releaseDate}"></td>
+                        <td th:text="${book.category}"></td>
+                        <td th:text="${book.bookPageNumber}"></td>
+                        <td th:text="${book.sold}"></td>
+                        <div th:if="${session.account}">
+                            <td class="btn-pro">
+                                <a th:href="@{~/book/{id} (id = ${book.id})}" class="btn btn-success"
+                                    style="width: 40%; padding: 0"><i class="ti-pencil-alt"></i></a>
+                                <div th:if="${session.account.isadmin}">
+                                    <a th:href="@{~/book/deleteB/{id}(id = ${book.id})}" class="btn btn-danger" 
+                                        onclick="return confirm('Bạn có muốn xóa cuốn sách này')"
+                                        style="width: 40%; padding: 0"><i class="ti-trash"></i></a>
+                                </div>
+
+                            </td>
+                        </div>
+
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${session.account != null}">
+                <div th:if="${session.account.isadmin == 1}">
+                    <a th:href="@{book/{id}(id = -1)}" class="btn btn-success col-lg-12">NewBook</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

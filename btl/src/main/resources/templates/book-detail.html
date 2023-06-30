@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/bookdetail.css" />
+</head>
+
+<body>
+
+    <div class="main">
+
+        <div class="title">THÔNG TIN SÁCH</div>
+        <div class="review">
+            <form th:object="${book}" th:action="@{savebook/{id}(id = ${book.id})}" method="post"
+                onsubmit="return validate()">
+                <input type="hidden" name="_method" th:value="${book.id} > 0 ? put:post">
+                <div class="infor width-49" style="margin-left: 100px;">
+
+                    <div class="div-1">
+                        <div class="book-title width-49">
+                            <div>Tiêu Đề:</div>
+                            <input type="text" th:value="${book.title}" name="title" disabled required>
+                        </div>
+
+                        <div class="author width-49">
+                            <div>Tác Giả:</div>
+                            <input type="text" th:value="${book.author}" name="author" disabled required>
+                        </div>
+                    </div>
+
+                    <div class="describe">
+                        <div>Mô Tả</div>
+                        <textarea name="description" id="describe-box" style="width: 85%;" rows="10"
+                            th:text="${book.description}" disabled required></textarea>
+                    </div>
+
+
+                    <div class="div-2">
+                        <div class="date width-49 ">
+                            <div>Ngày Phát Hành:</div>
+                            <input type="date" name="releaseDate" th:value="${book.releaseDate}" disabled required>
+                        </div>
+
+                        <div class="number-of-pages width-49 ">
+                            <div>Số Trang:</div>
+                            <input type="number" name="bookPageNumber" th:value="${book.bookPageNumber}" disabled
+                                required>
+                        </div>
+
+                    </div>
+
+                    <div class="div-3">
+                        <div class="price width-49">
+                            <div>Giá tiền</div>
+                            <input type="number" name="price" th:value="${book.price}" disabled required>
+                        </div>
+
+                        <div class="category width-49">
+                            <input type="hidden" th:value="${book.typeid}" id="hidden_type" name="hidden_type">
+                            <div>Thể Loại:</div>
+                            <select style="width: 70%; height: 35px;" disabled id="my-select"
+                                onchange="handleSelectChange(event)">
+                                <option th:each="type : ${listType}" th:value="${type.id}" th:text="${type.category}"
+                                    th:selected="${type.id == book.typeid}">
+                                </option>
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="img width-49">
+                    <input class="input-file" type="file" onchange="previewImage(event)" disabled>
+                    <div class="description-img" id="image">
+                        <input type="hidden" th:value="${book.image}" id="hidden_url" name="hidden_url">
+                        <img style="width: 250px; height: 400px;" th:src="${book.image}" alt="" id="image-preview">
+                    </div>
+                    <div class="input-btn" id="div-save" th:if="${session.account.isadmin}">
+                        <button class="img-btn" id="edit-book">Edit</button>
+                    </div>
+                    <div class="input-btn" id="div-buy" th:if="${session.account.isuser}"> <button class="img-btn"
+                            id="buy-item">Mua</button>
+                    </div>
+                    <a class="img-btn" href="/books" style="text-decoration: none; margin-right: 30px; ">Quay lại</a>
+                </div>
+            </form>
+
+            <hr>
+        </div>
+
+        <div th:if="${session.account.isuser}" class="comment-reting">
+            <div class="comment-reting-box">
+                <div class="view-comment-reting">
+
+                </div>
+
+                <div class="your-comment">
+                    <div class="user-rating">
+                        <div class="user-name">Đánh giá: </div>
+                        <div class="rating">
+                            <input type="radio" id="star5" name="rating" value="5" checked>
+                            <label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+
+
+                    </div>
+                    <div class="comment">
+                        <textarea name="comment" placeholder="Viết đánh giá của bạn"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var url = new URL(window.location.href);
+        var pathElements = url.pathname.split('/');
+        var id = pathElements[pathElements.length - 1];
+        var editButton = document.getElementById('edit-book');
+
+        var buyButton = document.getElementById('buy-item');
+
+        if (buyButton !== null) {
+            buyButton.onclick = async function (event) {
+                event.preventDefault();
+                await fetch(`/addCart/${id}`)
+                window.location.href = "http://localhost:8080/cart";
+            }
+        }
+
+        function validate() {
+            if (id < 0) {
+                var src = document.getElementById("hidden_url").value;
+
+                if (src === null || src === "") {
+                    alert("Vui lòng chọn ảnh trước khi save");
+                    return false;
+                }
+
+                var title = document.querySelector('input[name="title"]').value;
+                var author = document.querySelector('input[name="author"]').value;
+
+                // Gửi yêu cầu kiểm tra trùng lặp tên sách và tác giả
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/check-duplicate', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.duplicate) {
+                            alert('Tên sách và tác giả đã tồn tại trong cơ sở dữ liệu!');
+                        } else {
+                            document.querySelector('form').submit();
+                        }
+                    }
+                };
+
+                // Gửi dữ liệu kiểm tra trùng lặp
+                xhr.send(JSON.stringify({ title: title, author: author }));
+
+                return false;
+            }
+        }
+
+
+        if (editButton !== null) {
+            editButton.onclick = async function (event) {
+                event.preventDefault();
+
+                // Bỏ thuộc tính disabled của các thẻ input
+                var inputs = document.getElementsByTagName('input');
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].disabled = false;
+                }
+                document.getElementById("my-select").removeAttribute("disabled");
+                document.getElementById("describe-box").removeAttribute("disabled");
+
+                // Thay đổi nội dung của thẻ div
+                var saveDiv = document.getElementById('div-save');
+                saveDiv.innerHTML = '<button class="img-btn" id="save-book">Save</button>';
+            };
+        }
+
+
+        function handleSelectChange(event) {
+            document.getElementById("hidden_type").value = event.target.value;
+        }
+
+        function previewImage(event) {
+            var input = event.target;
+            console.log(input.files[0].name)
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var imageURL = URL.createObjectURL(file); // Lấy địa chỉ ảnh từ tệp đã chọn
+                var name = input.files[0].name
+                var url = '/image/' + name;
+                var image = document.getElementById('image');
+                image.innerHTML = '<input type="hidden" name = "hidden_url" value = "' + url + '" id = "hidden_url">' + '<img style="width: 250px; height: 400px;" src="' + url + '" alt="">';
+
+                // Lưu imageURL vào CSDL bằng cách gửi nó đến máy chủ
+                saveImageURL(imageURL);
+            }
+        }
+
+        document.querySelector('.comment textarea').addEventListener('keydown', async function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) { // Kiểm tra nếu phím người dùng nhấn là Enter (không nhấn Shift)
+                event.preventDefault();
+
+
+                rate = document.querySelector('.user-rating input:checked').value;
+                comment = document.querySelector('.comment textarea').value;
+                bookid = id;
+
+                const data = {
+                    rate: rate,
+                    comment: comment,
+                    bookid: bookid
+                };
+
+                console.log(data)
+
+                await fetch("/comment", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => response.json())
+                    .then((responseData) => {
+                        show(responseData)
+                        console.log(responseData);
+                    })
+                document.querySelector('.comment textarea').value = '';
+                document.querySelector('.user-rating input:checked').checked = false;
+            }
+        });
+
+
+        async function getapi() {
+            const response = await fetch(`/comments/${id}`);
+            const data = await response.json();
+            console.log(data)
+            show(data);
+        }
+        console.log("den day roi ne")
+        getapi()
+
+        function show(data) {
+            if (Array.isArray(data)) {
+                for (let comment of data) {
+                    var starIcons = '';
+                    for (let i = 0; i < comment.rate; i++) {
+                        starIcons += '<i class="fas fa-star"></i> ';
+                    }
+
+                    // Tạo phần tử mới chứa nội dung bình luận và số sao dưới dạng hình ảnh
+                    var newComment = document.createElement('div');
+                    newComment.classList.add('user-rating');
+                    newComment.innerHTML = `
+                <div class="user-name">${comment.username}</div>
+                <div class="rating">
+                ${starIcons}
+                </div>
+                </br>
+                <div class="comment" style="margin: 0;">
+                    ${comment.comment}
+                </div>
+                </div>
+                <hr>`;
+
+                    // Chèn phần tử mới vào đầu của phần bình luận
+                    var commentBox = document.querySelector('.view-comment-reting');
+                    commentBox.insertBefore(newComment, commentBox.lastChild);
+
+                }
+            } else {
+                var starIcons = '';
+                for (let i = 0; i < data.rate; i++) {
+                    starIcons += '<i class="fas fa-star"></i> ';
+                }
+
+                // Tạo phần tử mới chứa nội dung bình luận và số sao dưới dạng hình ảnh
+                var newComment = document.createElement('div');
+                newComment.classList.add('user-rating');
+                newComment.innerHTML = `
+                <div class="user-name">${data.username}</div>
+                <div class="rating">
+                ${starIcons}
+                </div>
+                </br>
+                <div class="comment" style="margin: 0;">
+                    ${data.comment}
+                </div>
+                </div>
+                <hr>`;
+
+                // Chèn phần tử mới vào đầu của phần bình luận
+                var commentBox = document.querySelector('.view-comment-reting');
+                commentBox.insertBefore(newComment, commentBox.lastChild);
+            }
+
+        }
+    </script>
+
+
+</body>
+
+</html>

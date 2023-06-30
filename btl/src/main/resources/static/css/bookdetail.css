@@ -1,0 +1,210 @@
+body {
+     margin: 0px 5%;
+     background-color: #ffffff;
+     width: 90%;
+
+ }
+
+ .main {
+     background-color: #f5e6f2;
+     margin-bottom: 50px;
+    
+ }
+ .navbar .a {
+    color:#fff
+ }
+
+ .title {
+     margin-top: 55px;
+     width: 100%;
+     text-align: center;
+     font-size: 30px;
+     padding-bottom: 30px;
+     padding-top: 30px;
+ }
+
+ input {
+     padding: 5px;
+     width: 70%;
+     outline: none;
+     border: 2px solid #6d1163;
+
+ }
+
+ .width-49 {
+     width: 49%
+ }
+
+ .review .infor {
+     padding: 10px;
+     border-right: 2px solid #6d1163;
+ }
+
+ .review form {
+     display: flex;
+ }
+
+ .infor .div-1,
+ .infor .div-2,
+ .infor .div-3 {
+     display: flex;
+     margin-bottom: 30px;
+ }
+
+
+
+
+ .infor .down .date,
+ .infor .down .number-of-page,
+ .infor .down .price,
+ .infor .down .category {
+     width: 49%;
+ }
+
+ .describe {
+
+     margin-bottom: 30px;
+ }
+
+ .describe-box {
+     text-align: center;
+     padding: 10%;
+ }
+
+ .img {
+
+     position: relative;
+     margin-right: 100px;
+     padding: 10px;
+
+ }
+
+ .img .description-img {
+     width: 250px;
+     height: 400px;
+     background-color: aqua;
+     position: relative;
+     left: 50%;
+     top: 28%;
+     transform: translate(-50%, -50%);
+     box-shadow: 5px #000;
+ }
+
+ .img .input-file {
+
+     width: 80px;
+
+     margin-top: 18px;
+     border: none;
+     padding: 5px;
+
+
+
+ }
+
+ .img input[type="file"]::-webkit-file-upload-button {
+     visibility: hidden;
+
+ }
+
+ .img input[type="file"]::file-selector-button {
+     visibility: hidden;
+
+ }
+
+ .img input[type="file"]::before {
+     content: 'Tải ảnh';
+     display: inline-block;
+     padding: 5px 10px;
+     border: 2px solid #6d1163;
+     cursor: pointer;
+     border-radius: 5px;
+     background-color: rgb(87, 28, 63);
+     color: #fff;
+ }
+
+ .img .img-btn {
+     width: 80px;
+     float: right;
+     background-color: rgb(87, 28, 63);
+     padding: 5px;
+     margin-bottom: 30px;
+     border: 2px solid #6d1163;
+     border-radius: 5px;
+     color: #fff;
+
+ }
+
+ .comment-reting {
+     margin: 0px 100px;
+ }
+
+
+ .comment-reting-box {
+     height: 50vh;
+     background-color: rgb(195, 166, 193);
+     padding: 20px;
+     position: relative;
+     overflow-x: hidden;
+     border: 2px solid #6d1163;
+     border-radius: 10px;
+     display: block;
+ }
+
+ .your-comment {
+     
+     bottom: 0;
+     width: 100%;
+     display: block;
+ }
+
+ .user-rating {
+     display: flex;
+ }
+
+ .rating {
+     display: inline-block;
+     direction: rtl;
+     /* Đảo ngược hướng hiển thị từ phải qua trái */
+     margin-left: 10px;
+
+ }
+
+ .rating input {
+     display: none;
+ }
+
+ .rating label {
+     color: #ddd;
+     font-size: 1rem;
+ }
+
+ .rating label:hover,
+ .rating label:hover~label {
+     color: gold;
+ }
+
+ .rating input:checked~label,
+ .rating input:checked~label~label {
+     color: gold;
+ }
+
+ .rating:before {
+     content: attr(data-prefix) " ";
+ }
+
+ .comment {
+     margin-top: 10px;
+ }
+
+ .comment textarea {
+     width: 98%;
+     height: auto;
+     min-height: 20px;
+     resize: vertical;
+     padding: 5px;
+     border: 1px solid #ddd;
+     overflow-y: hidden;
+     border-radius: 5px;
+ }
+

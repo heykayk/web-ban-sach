@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/singup.css">
+
+  <style>
+    body {
+      background-image: url(https://img4.thuthuatphanmem.vn/uploads/2020/07/05/hinh-anh-background-nen-xanh-dai-sao-trang-lap-lanh_034914488.jpg);
+
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="title">ĐĂNG KÍ</div>
+    <div class="content">
+      <form id="change-pass" th:action="@{singup}" method="post" onsubmit="return validateSingup()">
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details" style=" padding-top:30px;">Họ Và Tên</span>
+            <input type="text" id="name" name="fullname" placeholder="Họ và tên" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Email</span>
+            <input type="email" id="email" name="username" placeholder="Email" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Mật Khẩu</span>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+          </div>
+
+          <div style="display:flex; justify-content: space-around;">
+            <input class="form-btn" type="submit" value="Đăng Kí">
+            <a class="form-btn" style="text-decoration: none; text-align: center;" href="/books">Hủy</a>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    function validateSingup() {
+      var username = document.getElementById("email").value;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/check-singup', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          if (response.duplicate) {
+            alert('Email đã tồn tại');
+          } else {
+            document.querySelector('form').submit();
+          }
+        }
+      };
+
+      // Gửi dữ liệu kiểm tra trùng lặp
+      xhr.send(JSON.stringify({ username: username }));
+      return false;
+    }
+  </script>
+</body>
+
+</html>

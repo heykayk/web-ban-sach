@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/cart.css" />
+    <link rel="stylesheet" href="/css/themify-icons/themify-icons.css" />
+    <style></style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary"
+        style="z-index: 1; position:fixed; top: 0;right: 0;left: 0; margin: 0 5%;background-color: rgb(109, 36, 87); padding: 0px; ">
+        <div class="container-fluid" style="background-color: rgb(109, 36, 87); padding: 8px;">
+            <a class="navbar-brand" style="color: #fff" href="/books">BOOKS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup" th:if="${session.account}">
+                <div class="navbar-nav" th:if="${session.account.isuser}">
+                    <a class="nav-link " style="color: #fff" aria-current="page" href="/don-hang">Đơn Hàng</a>
+                    <a class="nav-link" style="color: #fff" aria-current="page" href="/cart">Giỏ Hàng</a>
+                </div>
+                <div class="navbar-nav" th:if="${session.account.isadmin}">
+                    <a class="nav-link " style="color: #fff" aria-current="page" href="#">Đơn Hàng</a>
+                </div>
+
+            </div>
+            <div th:if="${session.account == null}" class="navbar-nav ml-auto">
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-ki">Đăng kí</a>
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/dang-nhap">Đăng nhập</a>
+            </div>
+            <div th:if="${session.account != null}" class="navbar-nav ml-auto">
+                <a class="nav-link" style="color: #fff" aria-current="page" href="/logout">Đăng xuất</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="title">GIỎ HÀNG</div>
+        <form action="">
+            <div class="list-product" id="listcart">
+
+                <hr />
+
+
+
+                <div class="sumtotal">
+                    <div class="sum-toltal" style="font-size: 20px; font-weight: 500">
+                        <span style="color: rgb(109, 36, 87)">TỔNG TIỀN:</span>
+                        50000
+                    </div>
+                    <div class="btn-total">
+                        <button style="
+                background-color: rgb(109, 36, 87);
+                color: #fff;
+                padding: 5px;">
+                            Thanh Toán
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+
+        async function delProduct(id, event) {
+            if (confirm("Bạn có muốn xóa không?")) {
+                event.preventDefault();
+                await fetch(`/delCart/${id}`)
+                
+            }
+
+        }
+
+        async function payOrder(event){
+        	event.preventDefault();
+            await fetch(`/payOrder`)
+            window.location.href = "http://localhost:8080/don-hang";
+        }
+
+        async function addProduct(id) {
+            await fetch(`/addCart/${id}`)
+            getAllCart()
+        }
+
+        async function subProduct(id) {
+            await fetch(`subCart/${id}`)
+            getAllCart()
+        }
+
+        async function getAllCart() {
+            await fetch(`/listcart`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    showCart(data);
+                });
+        }
+
+        getAllCart();
+
+
+        function priceTotal(data) {
+            var c = 0
+            for (let cart of data) {
+                c += cart.price * cart.quantity
+            }
+            return c;
+        }
+
+
+        function showCart(data) {
+            let tab = ``;
+
+            for (let cart of data) {
+                tab += `<div class="product">
+                    <div class="img-product">
+                        <img src="${cart.image}" alt="" />
+                    </div>
+                    <div class="infor-product" style="width: 100%">
+                        <div class="name-product">
+                            <span>Tên Sách: </span>
+                            ${cart.title}
+                        </div>
+                        <div class="author">
+                            <span>Tên Tác Giả: </span>
+                            ${cart.author}
+                        </div>
+                        <div class="quantity-product">
+                            <span>Số Lượng:</span>
+                            <button class="minus is-form pro-btn" id="decrease-btn" type="button" onclick = "subProduct(${cart.bookid})">
+                                -
+                            </button>
+                            <input type="number" id="quantityInput" value="${cart.quantity}" min="1" max="10000" disabled />
+                            <button class="minus is-form pro-btn" id="increase-btn" type="button" onclick = "addProduct(${cart.bookid})">
+                                +
+                            </button>
+                        </div>
+
+                        <div class="price"><span>Gía Bán: </span>${cart.price}</div>
+                        <div class="btn-product">
+                            <button class="product-trash-btn btn btn-danger" type = "button" onclick = "delProduct(${cart.bookid}, event)">
+                                <i class="ti-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`
+            }
+            tab += `<hr />
+            <div class="sumtotal">
+                <div class="sum-toltal" style="font-size: 20px; font-weight: 500">
+                    <span style="color: rgb(109, 36, 87)">TỔNG TIỀN:</span>
+                    ${priceTotal(data)}
+                </div>
+                <div class="btn-total">
+                    <button style="
+                background-color: rgb(109, 36, 87);
+                color: #fff;
+                padding: 5px;" onclick = "payOrder(event)">
+                        Thanh Toán
+                    </button>
+                </div>
+            </div>`
+
+            document.getElementById("listcart").innerHTML = tab;
+        }
+    </script>
+</body>
+
+</html>
